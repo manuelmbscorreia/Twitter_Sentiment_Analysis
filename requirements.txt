@@ -1,0 +1,11 @@
+tweepy
+TextBlob
+pandas
+numpy
+matplotlib
+chardet
+datetime
+seaborn
+datetime
+WordCloud
+streamlit 

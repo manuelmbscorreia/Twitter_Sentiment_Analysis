@@ -1,0 +1,13 @@
+tweepy
+TextBlob
+pandas
+numpy
+matplotlib
+chardet
+datetime
+seaborn
+CategoricalDtype
+datetime
+textblob
+WordCloud
+streamlit 

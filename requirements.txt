@@ -1,0 +1,15 @@
+tweepy
+TextBlob
+pandas
+numpy
+matplotlib
+chardet
+datetime
+time
+seaborn
+calendar
+CategoricalDtype
+date
+TextBlob
+WordCloud
+streamlit 

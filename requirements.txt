@@ -1,5 +1,5 @@
 tweepy
-TextBlob
+textblob
 pandas
 numpy
 matplotlib
@@ -7,5 +7,5 @@ chardet
 datetime
 seaborn
 datetime
-WordCloud
+wordcloud
 streamlit 

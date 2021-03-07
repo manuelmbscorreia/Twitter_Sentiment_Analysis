@@ -46,17 +46,18 @@ class Twitter:
     def inputss(self):
 
         st.title("Welcome to Manuel's Twitter Sentiment Analysis Web App")
-        st.text("You must extract data first in order to proceed.")
+
         st.header("Extract data from Twitter")
 
 
         #Inputs for scraptweets()
 
-        numtweets = st.slider("Minimum number of Tweets to Explore", min_value=10, max_value=50000)
+        numtweets = st.slider("Number of Tweets to Explore on the API", min_value=10, max_value=50000)
         today = datetime.today().date()
         date_since = st.date_input('Date Since', today)
         st.text("Examples to fill in the search box: '#word OR #letter OR #mail'")
         search_words = st.text_input("#'s to search on Twitter: ", "#python")
+        st.write("To search for 10.000 Tweets can take around 30 min.")
 
         return numtweets, date_since, search_words
 
@@ -70,16 +71,13 @@ class Twitter:
                                                'followers', 'totaltweets', 'usercreatedts', 'tweetcreatedts',
                                                'retweetcount', 'text', 'hashtags'])
 
-        self.program_start = time.time()
 
-        self.start_run = time.time()
+        start_run = time.time()
 
         #Use Tweeter API
 
         tweets = tweepy.Cursor(self.api.search, q=search_words, lang="en", since=date_since,
                                tweet_mode='extended').items(numtweets)
-
-        st.write("Loading")
 
 
         tweet_list = [tweet for tweet in tweets]
@@ -161,20 +159,22 @@ class Twitter:
                     time.sleep(300)  # 5 minutos sleep time
 
 
-        self.end_run = time.time()
+        end_run = time.time()
 
-        self.duration_run = round((self.end_run - self.start_run) / 60, 2)
+        duration_run = round((end_run - start_run) / 60, 2)
 
         st.write(
             "Extraction Complete: no. of tweets scraped is {}, the number of ignored retweets is {} and the number of ignored duplicates is {}".format(
                 numTweets, reTweets, numDuplicated))
-        st.write("Extration was completed in {} min".format(self.duration_run))
+        st.write("Extration was completed in {} min".format(duration_run))
 
         database = db_tweets
 
         return database
 
 def Data_Manipulation():
+
+    #Todos os que têm 0 followers agora têm 1
 
     database['followers'] = database['followers'].replace(0, 1)
 
@@ -356,6 +356,8 @@ def nlps():
     database["Analysis"].value_counts().plot(kind="barh")
     st.pyplot()
 
+
+#Run the damn code
 
 numtweets, date_since, search_words = Twitter().inputss()
 database = Twitter().scraptweets()

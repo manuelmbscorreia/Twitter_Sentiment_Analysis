@@ -26,6 +26,8 @@ class Twitter:
         # see = pd.read_csv(r'C:\Users\29052020\Documents\Crypto\Twitter sentiment analysys\Login.csv')
         # see.to_csv(r'Login.csv')
 
+        #Login on the Twitter's API
+
         self.log = pd.read_csv(r"Login.csv")
 
         # Twitter API credentials
@@ -47,10 +49,13 @@ class Twitter:
         st.text("You must extract data first in order to proceed.")
         st.header("Extract data from Twitter")
 
+
+        #Inputs for scraptweets()
+
         numtweets = st.slider("Minimum number of Tweets to Explore", min_value=10, max_value=50000)
         today = datetime.today().date()
         date_since = st.date_input('Date Since', today)
-        st.text("Examples to fill in the search box: '#word or #letter or #mail'")
+        st.text("Examples to fill in the search box: '#word OR #letter OR #mail'")
         search_words = st.text_input("#'s to search on Twitter: ", "#python")
 
         return numtweets, date_since, search_words
@@ -60,6 +65,7 @@ class Twitter:
 
     def scraptweets(self):
 
+        #Create DF
         db_tweets = pd.DataFrame(columns=['username', 'acctdesc', 'location', 'following',
                                                'followers', 'totaltweets', 'usercreatedts', 'tweetcreatedts',
                                                'retweetcount', 'text', 'hashtags'])
@@ -68,10 +74,13 @@ class Twitter:
 
         self.start_run = time.time()
 
+        #Use Tweeter API
+
         tweets = tweepy.Cursor(self.api.search, q=search_words, lang="en", since=date_since,
                                tweet_mode='extended').items(numtweets)
 
-        print("Loading")
+        st.write("Loading")
+
 
         tweet_list = [tweet for tweet in tweets]
 
@@ -79,7 +88,7 @@ class Twitter:
         numTweets = 0
         numDuplicated = 0
 
-        # Inicio de Loop
+        # Access each Tweet
 
         for tweet in tweet_list:
             username = tweet.user.screen_name
@@ -97,10 +106,11 @@ class Twitter:
 
             try:
                 text = tweet.retweeted_status.full_text
-                self.reTweets += 1
+                reTweets += 1
+
                 # Check-in
                 if ((numTweets + reTweets + numDuplicated) % 2000) == 0:
-                    print(
+                    st.write(
                         "no. of tweets scraped is {}, the number of retweets is {} and the number of duplicates is {}. Please wait 5 min for more scrapping".format(
                             numTweets, reTweets, numDuplicated))
                     time.sleep(300)  # 5 minutos sleep time
@@ -133,7 +143,7 @@ class Twitter:
                 numDuplicated += 1
                 # Check-in
                 if ((numTweets + reTweets + numDuplicated) % 2000) == 0:
-                    print(
+                    st.write(
                         "no. of tweets scraped is {}, the number of retweets is {} and the number of duplicates is {}. Please wait 5 min for more scrapping".format(
                             numTweets, reTweets, numDuplicated))
                     time.sleep(300)  # 5 minutos sleep time
@@ -142,33 +152,23 @@ class Twitter:
             else:
                 db_tweets.loc[len(db_tweets)] = ith_tweet
                 numTweets += 1
-                # Check-in
 
+                # Check-in
                 if ((numTweets + reTweets + numDuplicated) % 2000) == 0:
-                    print(
+                    st.write(
                         "no. of tweets scraped is {}, the number of retweets is {} and the number of duplicates is {}. Please wait 5 min for more scrapping".format(
                             numTweets, reTweets, numDuplicated))
                     time.sleep(300)  # 5 minutos sleep time
 
-            # Check-in
-
-            # if ((numTweets + reTweets + numDuplicated) % 2000) == 0:
-            # print("no. of tweets scraped is {}, the number of retweets is {} and the number of duplicates is {}. Please wait 5 min for more scrapping".format(numTweets, reTweets, numDuplicated))
-            # time.sleep(300)  # 5 minutos sleep time
-            # pass
 
         self.end_run = time.time()
 
         self.duration_run = round((self.end_run - self.start_run) / 60, 2)
 
-        print(
+        st.write(
             "Extraction Complete: no. of tweets scraped is {}, the number of ignored retweets is {} and the number of ignored duplicates is {}".format(
                 numTweets, reTweets, numDuplicated))
-        print("Extration was completed in {} min".format(self.duration_run))
-
-        # Fim de loop
-
-        #self.db_tweets.to_csv("Twitter.csv", index=False)
+        st.write("Extration was completed in {} min".format(self.duration_run))
 
         database = db_tweets
 
@@ -208,6 +208,8 @@ def Data_Manipulation():
 
     database["usercreatedts"] = pd.to_datetime(database["usercreatedts"])
 
+    #Criar uma coluna que diz só a data de hoje
+
     datahoje = []
 
     for x in database["usercreatedts"]:
@@ -233,11 +235,11 @@ def Data_Manipulation():
 
     user_index = database.set_index("username")
 
-    top_ret_f = user_index.sort_values(["retweetsPerFollowers"], ascending=False).head(10)
+    topretf = user_index.sort_values(["retweetsPerFollowers"], ascending=False).head(10)
 
-    top_fol_hl = user_index.sort_values(["followersPerDay"], ascending=False).head(10)
+    topfolhl = user_index.sort_values(["followersPerDay"], ascending=False).head(10)
 
-    return database, user_index, top_ret_f, top_fol_hl, daysofweekcount
+    return database, user_index, topretf, topfolhl, daysofweekcount
 
 def visualizacoes():
 
@@ -245,12 +247,11 @@ def visualizacoes():
 
     st.text("Top users of Retweets per Followers")
 
-    #top_ret_f = top_ret_f[top_ret_f.index.duplicated(keep='first')]
+    #topretf = topretf[topretf.index.duplicated(keep='first')]
 
-    top_ret_f_items = top_ret_f["retweetsPerFollowers"]
-    st.bar_chart(top_ret_f_items)
+    topretf_items = topretf["retweetsPerFollowers"]
+    st.bar_chart(topretf_items)
 
-    st.text(top_ret_f_items.index)
 
     st.text("Tweets on day of the Week")
 
@@ -258,11 +259,10 @@ def visualizacoes():
 
     st.text("Top users of Followers Per Day")
 
-    #top_fol_hl = top_fol_hl[~top_fol_hl.index.duplicated(keep='first')]
-    top_fol_hl_items = top_fol_hl[["followersPerDay"]]
-    st.bar_chart(top_fol_hl_items)
+    #topfolhl = topfolhl[~topfolhl.index.duplicated(keep='first')]
+    topfolhl_items = topfolhl[["followersPerDay"]]
+    st.bar_chart(topfolhl_items)
 
-    st.text(top_fol_hl_items.index)
 
 def nlps():
 
@@ -359,7 +359,7 @@ def nlps():
 
 numtweets, date_since, search_words = Twitter().inputss()
 database = Twitter().scraptweets()
-database, user_index, top_ret_f, top_fol_hl, daysofweekcount = Data_Manipulation()
+database, user_index, topretf, topfolhl, daysofweekcount = Data_Manipulation()
 database
 visualizacoes()
 nlps()

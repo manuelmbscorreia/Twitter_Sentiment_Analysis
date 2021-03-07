@@ -47,13 +47,13 @@ class Twitter:
         st.text("You must extract data first in order to proceed.")
         st.header("Extract data from Twitter")
 
-        numTweets = st.slider("Minimum number of Tweets to Explore", min_value=10, max_value=50000)
+        numtweets = st.slider("Minimum number of Tweets to Explore", min_value=10, max_value=50000)
         today = datetime.today().date()
         date_since = st.date_input('Date Since', today)
         st.text("Examples to fill in the search box: '#word or #letter or #mail'")
         search_words = st.text_input("#'s to search on Twitter: ", "#python")
 
-        return numTweets, date_since, search_words
+        return numtweets, date_since, search_words
 
 
 
@@ -69,15 +69,15 @@ class Twitter:
         self.start_run = time.time()
 
         tweets = tweepy.Cursor(self.api.search, q=search_words, lang="en", since=date_since,
-                               tweet_mode='extended').items(numTweets)
+                               tweet_mode='extended').items(numtweets)
 
         print("Loading")
 
         tweet_list = [tweet for tweet in tweets]
 
-        self.reTweets = 0
-        self.numTweets = 0
-        self.numDuplicated = 0
+        reTweets = 0
+        numTweets = 0
+        numDuplicated = 0
 
         # Inicio de Loop
 
@@ -99,7 +99,7 @@ class Twitter:
                 text = tweet.retweeted_status.full_text
                 self.reTweets += 1
                 # Check-in
-                if ((self.numTweets + self.reTweets + self.numDuplicated) % 2000) == 0:
+                if ((numTweets + reTweets + numDuplicated) % 2000) == 0:
                     print(
                         "no. of tweets scraped is {}, the number of retweets is {} and the number of duplicates is {}. Please wait 5 min for more scrapping".format(
                             numTweets, reTweets, numDuplicated))
@@ -130,24 +130,24 @@ class Twitter:
             # Vamos a confirmar
 
             if resultado1 and resultado2:
-                self.numDuplicated += 1
+                numDuplicated += 1
                 # Check-in
-                if ((self.numTweets + self.reTweets + self.numDuplicated) % 2000) == 0:
+                if ((numTweets + reTweets + numDuplicated) % 2000) == 0:
                     print(
                         "no. of tweets scraped is {}, the number of retweets is {} and the number of duplicates is {}. Please wait 5 min for more scrapping".format(
-                            self.numTweets, self.reTweets, self.numDuplicated))
+                            numTweets, reTweets, numDuplicated))
                     time.sleep(300)  # 5 minutos sleep time
                     continue
 
             else:
                 db_tweets.loc[len(db_tweets)] = ith_tweet
-                self.numTweets += 1
+                numTweets += 1
                 # Check-in
 
-                if ((self.numTweets + self.reTweets + self.numDuplicated) % 2000) == 0:
+                if ((numTweets + reTweets + numDuplicated) % 2000) == 0:
                     print(
                         "no. of tweets scraped is {}, the number of retweets is {} and the number of duplicates is {}. Please wait 5 min for more scrapping".format(
-                            self.numTweets, self.reTweets, self.numDuplicated))
+                            numTweets, reTweets, numDuplicated))
                     time.sleep(300)  # 5 minutos sleep time
 
             # Check-in
@@ -163,7 +163,7 @@ class Twitter:
 
         print(
             "Extraction Complete: no. of tweets scraped is {}, the number of ignored retweets is {} and the number of ignored duplicates is {}".format(
-                self.numTweets, self.reTweets, self.numDuplicated))
+                numTweets, reTweets, numDuplicated))
         print("Extration was completed in {} min".format(self.duration_run))
 
         # Fim de loop
@@ -357,7 +357,7 @@ def nlps():
     st.pyplot()
 
 
-numTweets, date_since, search_words = Twitter().inputss()
+numtweets, date_since, search_words = Twitter().inputss()
 database = Twitter().scraptweets()
 database, user_index, top_ret_f, top_fol_hl, daysofweekcount = Data_Manipulation()
 database

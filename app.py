@@ -3,7 +3,7 @@ import tweepy
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-
+from pandas.api.types import CategoricalDtype
 plt.style.use("fivethirtyeight")
 import chardet
 from datetime import datetime
@@ -196,9 +196,9 @@ def Data_Manipulation():
 
     categorias = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
-    # cat = CategoricalDtype(categories=categorias, ordered=True)
+    #cat = CategoricalDtype(categories=categorias, ordered=True)
 
-    # database['Day of the Week'] = st.write(database["Day of the Week"].astype(cat)
+    #database['Day of the Week'] = st.write(database["Day of the Week"].astype(cat))
 
     daysofweekcount = database["Day of the Week"].value_counts().sort_index()
 
@@ -247,7 +247,7 @@ def visualizacoes():
 
     #top_ret_f = top_ret_f[top_ret_f.index.duplicated(keep='first')]
 
-    top_ret_f_items = top_ret_f[["retweetsPerFollowers"]]
+    top_ret_f_items = top_ret_f["retweetsPerFollowers"]
     st.bar_chart(top_ret_f_items)
 
     st.text(top_ret_f_items.index)
@@ -360,50 +360,9 @@ def nlps():
 numTweets, date_since, search_words = Twitter().inputss()
 database = Twitter().scraptweets()
 database, user_index, top_ret_f, top_fol_hl, daysofweekcount = Data_Manipulation()
+database
 visualizacoes()
 nlps()
 
 
 
-# with header:
-
-
-
-
-    # t = Twitter()
-    # t
-    #
-    # while (t.numTweets, t.date_since, t.search_words) == False:
-    #     time.sleep(5)
-    #
-    #
-    # t.scraptweets()
-    #
-    # st.header("Graphs based on Twitter Data")
-    #
-    # Twitter().Data_Manipulation()
-    #
-    # Twitter().visualizacoes()
-    #
-    # st.set_option('deprecation.showPyplotGlobalUse', False)
-    # st.header("Finally! Sentiment Analysis")
-    # st.text("Did the result meet your expectations?")
-    #
-    # Twitter().nlps()
-    #
-    # t.scraptweets()
-    #
-    #
-    #
-    # Twitter().Data_Manipulation()
-    #
-    # Twitter().visualizacoes()
-    #
-    #
-    #
-    # Twitter().nlps()
-
-# with visualizations:
-
-
-# with nLp:

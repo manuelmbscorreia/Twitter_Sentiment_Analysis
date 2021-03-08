@@ -52,7 +52,7 @@ class Twitter:
 
         #Inputs for scraptweets()
 
-        numtweets = st.slider("Number of Tweets to Explore on the API", min_value=10, max_value=50000)
+        numtweets = st.slider("Number of Tweets to Explore on the API", min_value=10, max_value=30000)
         today = datetime.today().date()
         date_since = st.date_input('Date Since', today)
         st.text("Examples to fill in the search box: '#word OR #letter OR #mail'")

@@ -45,19 +45,19 @@ class Twitter:
 
     def inputss(self):
 
-        st.title("Welcome to Manuel's Twitter Sentiment Analysis Web App")
+        st.title("Twitter Sentiment Analysis")
 
         st.header("Extract data from Twitter")
 
 
         #Inputs for scraptweets()
 
-        numtweets = st.slider("Number of Tweets to Explore on the API", min_value=10, max_value=30000)
+        numtweets = st.slider("Number of Tweets to Explore on the API:", min_value=10, max_value=30000)
         today = datetime.today().date()
         date_since = st.date_input('Date Since', today)
-        st.text("Examples to fill in the search box: '#word OR #letter OR #mail'")
+        st.text("Examples to fill in the search box: '#word OR #letter OR #mail'.")
         search_words = st.text_input("#'s to search on Twitter: ", "#python")
-        st.write("To search for 10.000 Tweets can take around 30 min.")
+        st.write("The App can take around 30 min to extract 10.000 tweets.")
 
         return numtweets, date_since, search_words
 
@@ -111,7 +111,7 @@ class Twitter:
                     st.write(
                         "no. of tweets scraped is {}, the number of retweets is {} and the number of duplicates is {}. Please wait 5 min for more scrapping".format(
                             numTweets, reTweets, numDuplicated))
-                    time.sleep(300)  # 5 minutos sleep time
+                    #time.sleep(300)  # 5 minutos sleep time
                     continue
 
 
@@ -144,7 +144,7 @@ class Twitter:
                     st.write(
                         "no. of tweets scraped is {}, the number of retweets is {} and the number of duplicates is {}. Please wait 5 min for more scrapping".format(
                             numTweets, reTweets, numDuplicated))
-                    time.sleep(300)  # 5 minutos sleep time
+                    #time.sleep(300)  # 5 minutos sleep time
                     continue
 
             else:
@@ -156,7 +156,7 @@ class Twitter:
                     st.write(
                         "no. of tweets scraped is {}, the number of retweets is {} and the number of duplicates is {}. Please wait 5 min for more scrapping".format(
                             numTweets, reTweets, numDuplicated))
-                    time.sleep(300)  # 5 minutos sleep time
+                    #time.sleep(300)  # 5 minutos sleep time
 
 
         end_run = time.time()

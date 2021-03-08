@@ -57,7 +57,7 @@ class Twitter:
         date_since = st.date_input('Date Since', today)
         st.text("Examples to fill in the search box: '#word OR #letter OR #mail'.")
         search_words = st.text_input("#'s to search on Twitter: ", "#python")
-        st.write("The App can take around 30 min to extract 10.000 tweets.")
+        st.write("The App can take around 10 min to extract 30.000 tweets.")
 
         return numtweets, date_since, search_words
 

@@ -245,23 +245,34 @@ def visualizacoes():
 
     st.header("Graphs based on Twitter Data")
 
-    st.text("Top users of Retweets per Followers")
+    sel1 = st.selectbox(label="Select a Column", options= database.drop(["date of extraction", "tweetcreatedts", "usercreatedts", "text", "hashtags", "acctdesc"],
+  axis='columns').columns)
 
-    #topretf = topretf[topretf.index.duplicated(keep='first')]
+    sel2 = st.selectbox(label="Select a Column", options=database.drop(["date of extraction", sel1, "tweetcreatedts", "usercreatedts", "text", "hashtags", "acctdesc"],
+  axis='columns').columns)
 
-    topretf_items = topretf["retweetsPerFollowers"]
-    st.bar_chart(topretf_items)
+    plt.bar(database[sel1], database[sel2])
+    plt.xticks(rotation='vertical')
 
+    st.pyplot()
 
-    st.text("Tweets on day of the Week")
-
-    st.line_chart(daysofweekcount)
-
-    st.text("Top users of Followers Per Day")
-
-    #topfolhl = topfolhl[~topfolhl.index.duplicated(keep='first')]
-    topfolhl_items = topfolhl[["followersPerDay"]]
-    st.bar_chart(topfolhl_items)
+    # st.text("Top users of Retweets per Followers")
+    #
+    # #topretf = topretf[topretf.index.duplicated(keep='first')]
+    #
+    # topretf_items = topretf["retweetsPerFollowers"]
+    # st.bar_chart(topretf_items)
+    #
+    #
+    # st.text("Tweets on day of the Week")
+    #
+    # st.line_chart(daysofweekcount)
+    #
+    # st.text("Top users of Followers Per Day")
+    #
+    # #topfolhl = topfolhl[~topfolhl.index.duplicated(keep='first')]
+    # topfolhl_items = topfolhl[["followersPerDay"]]
+    # st.bar_chart(topfolhl_items)
 
 
 def nlps():

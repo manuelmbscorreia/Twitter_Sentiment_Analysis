@@ -3,6 +3,7 @@ import tweepy
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from pandas import DataFrame
 from pandas.api.types import CategoricalDtype
 plt.style.use("fivethirtyeight")
 import chardet
@@ -57,7 +58,7 @@ class Twitter:
         date_since = st.date_input('Date Since', today)
         st.text("Examples to fill in the search box: '#word OR #letter OR #mail'.")
         search_words = st.text_input("#'s to search on Twitter: ", "#python")
-        st.write("The App can take around 10 min to extract 30.000 tweets.")
+        st.write("The App can take around 30 min to extract 30.000 tweets and another 30 min to store those tweets. \n Please be patient.")
 
         return numtweets, date_since, search_words
 
@@ -67,7 +68,7 @@ class Twitter:
     def scraptweets(self):
 
         #Create DF
-        db_tweets = pd.DataFrame(columns=['username', 'acctdesc', 'location', 'following',
+        db_tweets: DataFrame = pd.DataFrame(columns=['username', 'acctdesc', 'location', 'following',
                                                'followers', 'totaltweets', 'usercreatedts', 'tweetcreatedts',
                                                'retweetcount', 'text', 'hashtags'])
 
@@ -105,18 +106,12 @@ class Twitter:
             try:
                 text = tweet.retweeted_status.full_text
                 reTweets += 1
-
-                # Check-in
-                if ((numTweets + reTweets + numDuplicated) % 2000) == 0:
-                    st.write(
-                        "no. of tweets scraped is {}, the number of retweets is {} and the number of duplicates is {}. Please wait 5 min for more scrapping".format(
-                            numTweets, reTweets, numDuplicated))
-                    #time.sleep(300)  # 5 minutos sleep time
-                    continue
+                continue
 
 
             except AttributeError:  # Not a Retweet
                 text = tweet.full_text
+
 
             ith_tweet = [username, acctdesc, location, following, followers, totaltweets,
                          usercreatedts, tweetcreatedts, retweetcount, text, hashtags]
@@ -139,42 +134,46 @@ class Twitter:
 
             if resultado1 and resultado2:
                 numDuplicated += 1
-                # Check-in
-                if ((numTweets + reTweets + numDuplicated) % 2000) == 0:
-                    st.write(
-                        "no. of tweets scraped is {}, the number of retweets is {} and the number of duplicates is {}. Please wait 5 min for more scrapping".format(
-                            numTweets, reTweets, numDuplicated))
-                    #time.sleep(300)  # 5 minutos sleep time
-                    continue
+                #continue
+
 
             else:
                 db_tweets.loc[len(db_tweets)] = ith_tweet
                 numTweets += 1
-
-                # Check-in
-                if ((numTweets + reTweets + numDuplicated) % 2000) == 0:
-                    st.write(
-                        "no. of tweets scraped is {}, the number of retweets is {} and the number of duplicates is {}. Please wait 5 min for more scrapping".format(
-                            numTweets, reTweets, numDuplicated))
-                    #time.sleep(300)  # 5 minutos sleep time
 
 
         end_run = time.time()
 
         duration_run = round((end_run - start_run) / 60, 2)
 
-        st.write(
-            "Extraction Complete: no. of tweets scraped is {}, the number of ignored retweets is {} and the number of ignored duplicates is {}".format(
-                numTweets, reTweets, numDuplicated))
-        st.write("Extration was completed in {} min".format(duration_run))
+        ttweetss = numTweets + reTweets + numDuplicated
 
-        database = db_tweets
+        st.write(
+            "Extraction Complete: no. of tweets scraped is {}, no. of ignored retweets is {} and no. of ignored duplicates is {}. Total tweets explored: {}".format(
+                numTweets, reTweets, numDuplicated, ttweetss))
+
+
+        db_tweets.to_csv(r"db_tweets.csv")
+        database = pd.read_csv(r"db_tweets.csv")
+
+        end_run1 = time.time()
+
+        duration_run1 = round((end_run1 - start_run) / 60, 2)
+
+        totaltime = duration_run1 + duration_run
+
+        st.write("Extration was completed in {} min and it took {} min to save the dataframe. \n "
+                 "Total time: {} min.".format(duration_run, duration_run1, totaltime))
 
         return database
 
 def Data_Manipulation():
 
     #Todos os que têm 0 followers agora têm 1
+
+    database = pd.read_csv(r"db_tweets.csv")
+
+
 
     database['followers'] = database['followers'].replace(0, 1)
 
@@ -239,43 +238,45 @@ def Data_Manipulation():
 
     topfolhl = user_index.sort_values(["followersPerDay"], ascending=False).head(10)
 
+    database.to_csv("db_tweets.csv")
+
+    database = pd.read_csv(r"db_tweets.csv")
+
     return database, user_index, topretf, topfolhl, daysofweekcount
+
 
 def visualizacoes():
 
+    database = pd.read_csv(r"db_tweets.csv")
+
+    database["location"] = database["location"].apply(str)
+    database["username"] = database["username"].apply(str)
+
     st.header("Graphs based on Twitter Data")
 
-    sel1 = st.selectbox(label="Select a Column", options= database.drop(["date of extraction", "tweetcreatedts", "usercreatedts", "text", "hashtags", "acctdesc"],
+    st.write("If you select 'Day of the Week' it will show the no. os tweets extract of each day of the Week")
+    sel1 = st.selectbox(label="Select a Column", options= database.drop(["date of extraction", "tweetcreatedts", "usercreatedts", "text", "hashtags", "acctdesc", "Unnamed: 0", "Unnamed: 0.1"],
   axis='columns').columns)
 
-    sel2 = st.selectbox(label="Select a Column", options=database.drop(["date of extraction", sel1, "tweetcreatedts", "usercreatedts", "text", "hashtags", "acctdesc"],
-  axis='columns').columns)
+    if sel1 == "Day of the Week":
+        plt.barh(database[sel1], database["Day of the Week"].value_counts())
+        plt.xticks(rotation='vertical')
+        st.pyplot()
+        pass
 
-    plt.bar(database[sel1], database[sel2])
-    plt.xticks(rotation='vertical')
-
-    st.pyplot()
-
-    # st.text("Top users of Retweets per Followers")
-    #
-    # #topretf = topretf[topretf.index.duplicated(keep='first')]
-    #
-    # topretf_items = topretf["retweetsPerFollowers"]
-    # st.bar_chart(topretf_items)
-    #
-    #
-    # st.text("Tweets on day of the Week")
-    #
-    # st.line_chart(daysofweekcount)
-    #
-    # st.text("Top users of Followers Per Day")
-    #
-    # #topfolhl = topfolhl[~topfolhl.index.duplicated(keep='first')]
-    # topfolhl_items = topfolhl[["followersPerDay"]]
-    # st.bar_chart(topfolhl_items)
+    else:
+        sel2 = st.selectbox(label="Select a Column", options=database.drop(
+            ["date of extraction", sel1, "tweetcreatedts", "usercreatedts", "text", "hashtags", "acctdesc",
+             "Unnamed: 0", "Unnamed: 0.1"],
+            axis='columns').columns)
+        plt.barh(database[sel1].head(10), database[sel2].head(10))
+        plt.xticks(rotation='vertical')
+        st.pyplot()
 
 
 def nlps():
+
+    database = pd.read_csv(r"db_tweets.csv")
 
     st.set_option('deprecation.showPyplotGlobalUse', False)
 
@@ -287,6 +288,7 @@ def nlps():
         text = re.sub(r'"#', "", text)  # Removing the "#" symbol
         text = re.sub(r'RT[\s]+', "", text)  # Removing RT
         text = re.sub(r'https?:\/\/\S+', "", text)  # Remove the hyper link
+        text = re.sub(r'$', "", text)  # Remove the hyper link
 
         return text
 
@@ -370,12 +372,20 @@ def nlps():
 
 #Run the damn code
 
-numtweets, date_since, search_words = Twitter().inputss()
-database = Twitter().scraptweets()
-database, user_index, topretf, topfolhl, daysofweekcount = Data_Manipulation()
-database
-visualizacoes()
-nlps()
+
+rad = st.sidebar.radio("Select a Step", ["Extract Data", "Visualize Data", "Data Sentiment Analysis"])
+
+if rad == "Extract Data":
+    numtweets, date_since, search_words = Twitter().inputss()
+    database = Twitter().scraptweets()
+    database, user_index, topretf, topfolhl, daysofweekcount = Data_Manipulation()
+    database
+
+if rad == "Visualize Data":
+    visualizacoes()
+
+if rad == "Data Sentiment Analysis":
+    nlps()
 
 
 

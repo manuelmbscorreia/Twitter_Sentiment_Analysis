@@ -53,12 +53,12 @@ class Twitter:
 
         #Inputs for scraptweets()
 
-        numtweets = st.slider("Number of Tweets to Explore on the API:", min_value=10, max_value=30000)
+        numtweets = st.slider("Number of Tweets to Explore on the API:", min_value=10, max_value=500)
         today = datetime.today().date()
         date_since = st.date_input('Date Since', today)
         st.text("Examples to fill in the search box: '#word OR #letter OR #mail'.")
         search_words = st.text_input("#'s to search on Twitter: ", "#python")
-        st.write("The App can take around 30 min to extract 30.000 tweets and another 30 min to store those tweets. \n Please be patient.")
+        st.write("Please be patient. To gather the Data might take a few minutes.")
 
         return numtweets, date_since, search_words
 

@@ -32,8 +32,8 @@ class Twitter:
         self.log = pd.read_csv(r"Login.csv")
 
         # Twitter API credentials
-        self.consumerKey = self.log.iloc[1,0] #API Key
-        self.consumerSecret = self.log.iloc[1,1] #API Secret Key
+        self.consumerKey = self.log.iloc[0,0] #API Key
+        self.consumerSecret = self.log.iloc[0,1] #API Secret Key
 
         # Create the authentication object
         self.authenticate = tweepy.OAuthHandler(self.consumerKey, self.consumerSecret)

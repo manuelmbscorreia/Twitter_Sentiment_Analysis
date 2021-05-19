@@ -55,7 +55,7 @@ class Twitter:
 
         numtweets = st.slider("Number of Tweets to Explore on the API:", min_value=10, max_value=500)
         today = datetime.today().date()
-        date_since = st.date_input('Date Since', today)
+        date_since = datetime.today().strftime('%Y-%m-%d')
         st.text("Examples to fill in the search box: '#word OR #letter OR #mail'.")
         search_words = st.text_input("#'s to search on Twitter: ", "#python")
         st.write("Please be patient. To gather the Data might take a few minutes.")
